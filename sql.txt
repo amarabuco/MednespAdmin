@@ -1,0 +1,78 @@
+//06-12-17
+CREATE TABLE `Palestra` (
+  `id` int(11) NOT NULL,
+  `data` date NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fim` time NOT NULL,
+  `local` varchar(255) NOT NULL,
+  `assunto` varchar(255) NOT NULL,
+  `palestrante` int(255) NOT NULL,
+  `tag` varchar(255) DEFAULT NULL,
+  `descricao` text,
+  `capacidade` int(11) DEFAULT NULL,
+  `imagem` text
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+ALTER TABLE `Palestra`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `Palestra`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;COMMIT;
+
+CREATE TABLE `mednesp`.`palestrante` ( `id` INT NOT NULL AUTO_INCREMENT , `nome` VARCHAR(255) NOT NULL , `origem` VARCHAR(255) NOT NULL , `profissao` VARCHAR(255) NOT NULL , `bio` TEXT NULL , `imagem` TEXT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+//06-12-17 (2a parte)
+
+ALTER TABLE `palestra` ADD `ativo` INT NULL DEFAULT '0' AFTER `imagem`;
+
+//11-12-17
+CREATE TABLE `mednesp`.`pessoa` ( `id` INT NOT NULL AUTO_INCREMENT , `nome` VARCHAR(255) NOT NULL , `email` VARCHAR(255) NOT NULL , `senha` VARCHAR(255) NOT NULL , `telefone` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `mednesp`.`inscricao` ( `id` INT NOT NULL AUTO_INCREMENT , `data_transacao` TIMESTAMP NOT NULL , `codigo` VARCHAR(50) NOT NULL , `status` INT NOT NULL , `data_atualizacao` TIMESTAMP NOT NULL , `tipo_pagamento` VARCHAR(255) NOT NULL , `link_pgto` VARCHAR(255) NOT NULL , `valor_bruto` FLOAT NOT NULL , `valor_taxa` FLOAT NOT NULL , `valor desconto` FLOAT NOT NULL , `valor_liquido` FLOAT NOT NULL , `data_liquidacao` TIMESTAMP NOT NULL , `parcelas` INT NOT NULL , `qtd` INT NOT NULL , `id_produto` INT NOT NULL , `produto` VARCHAR(255) NOT NULL , `preco` FLOAT NOT NULL , `pessoa` INT NOT NULL , `endereco` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `mednesp`.`endereco` ( `id` INT NOT NULL AUTO_INCREMENT , `rua` VARCHAR(255) NOT NULL , `numero` VARCHAR(5) NOT NULL , `complemento` VARCHAR(255) NOT NULL , `bairro` VARCHAR(255) NOT NULL , `cidade` VARCHAR(255) NOT NULL , `estado` VARCHAR(2) NOT NULL , `pais` VARCHAR(3) NOT NULL , `cep` VARCHAR(9) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+//14-12-17
+ALTER TABLE `inscricao` ADD UNIQUE(`codigo`);
+
+//18-12-17
+ALTER TABLE `inscricao` ADD `data_api` TIMESTAMP NOT NULL AFTER `endereco`;
+ALTER TABLE `inscricao` CHANGE `valor desconto` `valor_desconto` FLOAT NOT NULL;
+
+//19-12-17
+ALTER TABLE `endereco` ADD `pessoa` INT NOT NULL AFTER `cep`;
+
+//20-12-17
+CREATE TABLE `mednesp`.`config_api` ( `email` VARCHAR(255) NOT NULL , `token` VARCHAR(255) NOT NULL , `data_inicio` DATE NOT NULL , `data_fim` DATE NOT NULL , `pagina` INT NOT NULL , `max` INT NOT NULL ) ENGINE = InnoDB;
+ALTER TABLE `config_api` CHANGE `data_inicio` `data_inicio` VARCHAR(255) NOT NULL;
+ALTER TABLE `config_api` CHANGE `data_fim` `data_fim` VARCHAR(255) NOT NULL;
+
+//21-12-17
+CREATE TABLE `mednesp`.`status` ( `id` INT NOT NULL AUTO_INCREMENT , `nome` VARCHAR(50) NOT NULL , `descricao` VARCHAR(255) NOT NULL , `codigo` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+INSERT INTO `status` (`id`, `nome`, `descricao`, `codigo`) VALUES ('1', 'Aguardando Pagamento', 'o comprador iniciou a transação, mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.', '1'), ('2', 'Em análise', 'o comprador optou por pagar com um cartão de crédito e o PagSeguro está analisando o risco da transação.', '2'), ('3', 'Paga', 'a transação foi paga pelo comprador e o PagSeguro já recebeu uma confirmação da instituição financeira responsável pelo processamento.', '3'), ('4', 'Disponível', 'a transação foi paga e chegou ao final de seu prazo de liberação sem ter sido retornada e sem que haja nenhuma disputa aberta.', '4'), ('5', 'Em disputa', 'o comprador, dentro do prazo de liberação da transação, abriu uma disputa.', '5'), ('6', 'Devolvida', 'o valor da transação foi devolvido para o comprador.', '6'), ('7', 'Cancelada', 'a transação foi cancelada sem ter sido finalizada.', '7');
+
+CREATE TABLE `mednesp`.`meio_pagamento` ( `id` INT NOT NULL AUTO_INCREMENT , `nome` VARCHAR(50) NOT NULL , `descricao` VARCHAR(255) NOT NULL , `codigo` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+INSERT INTO `meio_pagamento` (`id`, `nome`, `descricao`, `codigo`) VALUES ('1', 'Cartão de crédito', 'o comprador escolheu pagar a transação com cartão de crédito.', '1'), ('2', 'Boleto', 'o comprador optou por pagar com um boleto bancário.', '2'), ('3', 'Débito online(TEF)', 'o comprador optou por pagar a transação com débito online de algum dos bancos conveniados.', '3'), ('4', 'Saldo PagSeguro', 'o comprador optou por pagar a transação utilizando o saldo de sua conta PagSeguro.', '4'), ('7', 'Depósito em conta', 'o comprador optou por fazer um depósito na conta corrente do PagSeguro. Ele precisará ir até uma agência bancária, fazer o depósito, guardar o comprovante e retornar ao PagSeguro para informar os dados do pagamento.', '7')
+
+ALTER TABLE `inscricao` ADD `codigo_pagamento` INT NOT NULL AFTER `data_api`;
+
+CREATE TABLE `mednesp`.`codigo_pagamento` ( `id` INT NOT NULL AUTO_INCREMENT , `codigo` INT NOT NULL , `nome` VARCHAR(255) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+INSERT INTO `codigo_pagamento` (`id`, `codigo`, `nome`) VALUES (NULL, '101', 'Cartão de crédito Visa'), (NULL, '102', 'Cartão de crédito MasterCard'), (NULL, '103', 'Cartão de crédito American Express'), (NULL, '104', 'Cartão de crédito Diners'), (NULL, '105', 'Cartão de crédito Hipercard'), (NULL, '106', 'Cartão de crédito Aura'), (NULL, '107', 'Cartão de crédito Elo'), (NULL, '109', 'Cartão de crédito PersonalCard'), (NULL, '112', 'Cartão de crédito BrasilCard'), (NULL, '113', 'Cartão de crédito FORTBRASIL'), (NULL, '115', 'Cartão de crédito VALECARD'), (NULL, '116', 'Cartão de crédito Cabal'), (NULL, '117', 'Cartão de crédito Mais!'), (NULL, '119', 'Cartão de crédito GRANDCARD'), (NULL, '120', 'Cartão de crédito Sorocred'), (NULL, '122', 'Cartão de crédito Up Policard'), (NULL, '123', 'Cartão de crédito Banese Card'), (NULL, '201', 'Boleto Bradesco'), (NULL, '202', 'Boleto Santander'), (NULL, '301', 'Débito online Bradesco'), (NULL, '302', 'Débito online Itaú'), (NULL, '304', 'Débito online Banco do Brasil'), (NULL, '306', 'Débito online Banrisul'), (NULL, '401', 'Saldo PagSeguro'), (NULL, '701', 'Depósito em conta - Banco do Brasil')
+
+//23-01-18
+CREATE TABLE `mednesp`.`relacoes` ( `id` INT NOT NULL , `t_origem` VARCHAR(50) NOT NULL , `c_origem` VARCHAR(50) NOT NULL , `t_destino` VARCHAR(50) NOT NULL , `c_destino` VARCHAR(50) NOT NULL , `tipo` VARCHAR(20) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `relacoes` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `relacoes` ADD `c_exibivel` VARCHAR(50) NOT NULL AFTER `c_destino`;
+
+//24-01-18
+CREATE TABLE `mednesp`.`tipo_formulario` ( `id` INT NOT NULL AUTO_INCREMENT , `nome` VARCHAR(50) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+//17-03-18
+ALTER TABLE `relacoes` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tipo_formulario` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+
+//19-03-18
+ALTER TABLE `palestra` CHANGE `data` `data` VARCHAR(8) NOT NULL;
