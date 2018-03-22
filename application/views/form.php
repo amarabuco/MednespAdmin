@@ -153,6 +153,16 @@
                 
                 $("input[name='cpf']").mask('000.000.000-00', {reverse: true});
                 $("input[name='cnpj']").mask('00.000.000/0000-00', {reverse: true});
+
+        
+        
+        $('input').keypress(function(e) {
+        if(e.which == 13) {
+            //console.log($(this));
+            $(this).parent('p').next('p').find('input').focus();
+            e.preventDefault();
+        }
+    });        
         
 });
     </script>
